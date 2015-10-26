@@ -2,7 +2,14 @@
   "name": "material-modal",
   "version": "0.1.0",
   "description": "A modal dialog for use with Material Design Lite",
-  "main": "index.js",
+  "main": "Gruntfile.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MarkRabey/material-modal"
+  },
+  "bugs": {
+    "url": "https://github.com/MarkRabey/material-modal/issues"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
