@@ -114,13 +114,13 @@ var Modal = (function (document, window) {
   };
 
   var close = function(event) {
-
-    event.preventDefault();
-    event.stopImmediatePropagation();
+    // event.preventDefault();
+    // event.stopImmediatePropagation();
 
     var target = event.target;
     var div = document.getElementById('modal__temp');
 
+    console.log(target);
     function removeDiv() {
       setTimeout(function() {
         window.requestAnimationFrame(function() {
@@ -130,7 +130,8 @@ var Modal = (function (document, window) {
     }
 
     if (isOpen && target.classList.contains('modal__bg') || target.classList.contains('modal__close')) {
-
+      event.preventDefault();
+      event.stopImmediatePropagation();
       // make the hidden div visible again and remove the transforms so it scales back to its original size
       div.style.opacity = '1';
       // div.style.backgroundColor = window.getComputedStyle(self).backgroundColor;
@@ -153,6 +154,8 @@ var Modal = (function (document, window) {
       div.addEventListener('transitionend', removeDiv, false);
 
       isOpen = false;
+
+    } else {
 
     }
   };
