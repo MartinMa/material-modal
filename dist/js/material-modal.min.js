@@ -1,5 +1,5 @@
 /*!
- * Material Modal v0.1.1
+ * Material Modal v0.1.2
  * Copyright 2015 Mark Rabey <mark@markrabey.com> (markrabey.com)
  * Licensed under the MIT license
  */
