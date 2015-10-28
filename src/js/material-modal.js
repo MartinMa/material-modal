@@ -15,8 +15,6 @@ var Modal = (function (document, window) {
   var w = window;
   var isOpen = false;
   var contentDelay = 400;
-  var len = trigger.length;
-
 
   var getId = function(event) {
 
@@ -119,7 +117,7 @@ var Modal = (function (document, window) {
 
     var target = event.target;
     var div = document.getElementById('modal__temp');
-
+    var i;
     console.log(target);
     function removeDiv() {
       setTimeout(function() {
@@ -137,17 +135,17 @@ var Modal = (function (document, window) {
       // div.style.backgroundColor = window.getComputedStyle(self).backgroundColor;
       div.removeAttribute('style');
 
-      /**
-      * iterate through the modals and modal contents and triggers to remove their active classes.
-      * remove the inline css from the trigger to move it back into its original position.
-      */
-
-      for (var i = 0; i < len; i++) {
-        modals[i].classList.remove('modal--active');
-        content[i].classList.remove('modal__content--active');
+      /* Remove active classes from triggers */
+      for (i = 0; i < trigger.length; i++) {
         trigger[i].style.transform = 'none';
         trigger[i].style.webkitTransform = 'none';
         trigger[i].classList.remove('modal__trigger--active');
+      }
+
+      /* Remove active classes from modals */
+      for (i = 0; i < modals.length; i++) {
+        modals[i].classList.remove('modal--active');
+        content[i].classList.remove('modal__content--active');
       }
 
       // when the temporary div is opacity:1 again, we want to remove it from the dom
@@ -161,11 +159,22 @@ var Modal = (function (document, window) {
   };
 
   var bindActions = function() {
-    for (var i = 0; i < len; i++) {
+    var i;
+    /* bind triggers */
+    for (i = 0; i < trigger.length; i++) {
       trigger[i].addEventListener('click', getId, false);
+    }
+
+    /* bind modals */
+    for (i = 0; i < closers.length; i++) {
       closers[i].addEventListener('click', close, false);
+    }
+
+    /* bind modal__bgs */
+    for (i = 0; i < modalsbg.length; i++) {
       modalsbg[i].addEventListener('click', close, false);
     }
+
   };
 
   var init = function() {
