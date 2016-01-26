@@ -1,38 +1,57 @@
 var Modal = (function (document, window) {
   'use strict';
 
-  var methods = {
+  var methods,
+    trigger,
+    modals,
+    modalsbg,
+    content,
+    closers,
+    w,
+    isOpen,
+    contentDelay,
+    getId,
+    makeDiv,
+    moveTrig,
+    open,
+    close,
+    bindActions,
+    init;
+  
+  methods = {
     qsa: function (el) {
       return document.querySelectorAll(el);
     }
   };
 
-  var trigger = methods.qsa('.modal__trigger');
-  var modals = methods.qsa('.modal');
-  var modalsbg = methods.qsa('.modal__bg');
-  var content = methods.qsa('.modal__content');
-  var closers = methods.qsa('.modal__close');
-  var w = window;
-  var isOpen = false;
-  var contentDelay = 400;
+  trigger = methods.qsa('.modal__trigger');
+  modals = methods.qsa('.modal');
+  modalsbg = methods.qsa('.modal__bg');
+  content = methods.qsa('.modal__content');
+  closers = methods.qsa('.modal__close');
+  w = window;
+  isOpen = false;
+  contentDelay = 400;
 
-  var getId = function(event) {
-
+  getId = function (event) {
+    var self, modalId, len, modalIdTrimmed, modal;
+    
     event.preventDefault();
-    var self = this;
-    var modalId = self.dataset.modal;
-    var len = modalId.length;
-    var modalIdTrimmed = modalId.substring(1, len);
-    var modal = document.getElementById(modalIdTrimmed);
+    self = this;
+    modalId = self.dataset.modal;
+    len = modalId.length;
+    modalIdTrimmed = modalId.substring(1, len);
+    modal = document.getElementById(modalIdTrimmed);
     makeDiv(self, modal);
   };
 
-  var makeDiv = function(self, modal) {
+  makeDiv = function (self, modal) {
+    var tempdiv, div;
 
-    var tempdiv = document.getElementById('modal__temp');
+    tempdiv = document.getElementById('modal__temp');
 
     if (tempdiv === null) {
-      var div = document.createElement('div');
+      div = document.createElement('div');
       div.id = 'modal__temp';
       self.appendChild(div);
       div.style.backgroundColor = window.getComputedStyle(self).backgroundColor;
@@ -40,13 +59,14 @@ var Modal = (function (document, window) {
     }
   };
 
-  var moveTrig = function(trig, modal, div) {
-    var trigProps = trig.getBoundingClientRect();
-    var m = modal;
-    var mProps = m.querySelector('.modal__content').getBoundingClientRect();
-    var transX, transY, scaleX, scaleY;
-    var xc = w.innerWidth / 2;
-    var yc = w.innerHeight / 2;
+  moveTrig = function (trig, modal, div) {
+    var trigProps, m, mProps, transX, transY, scaleX, scaleY, xc, yc;
+    
+    trigProps = trig.getBoundingClientRect();
+    m = modal;
+    mProps = m.querySelector('.modal__content').getBoundingClientRect();
+    xc = w.innerWidth / 2;
+    yc = w.innerHeight / 2;
 
     // this class increases z-index value so the button goes overtop the other buttons
     trig.classList.add('modal__trigger--active');
@@ -79,15 +99,15 @@ var Modal = (function (document, window) {
     div.style.webkitTransform = 'scale(' + scaleX + ',' + scaleY + ')';
 
 
-    window.setTimeout(function() {
-      window.requestAnimationFrame(function() {
+    window.setTimeout(function () {
+      window.requestAnimationFrame(function () {
         open(m, div);
       });
     }, contentDelay);
 
   };
 
-  var open = function(m, div) {
+  open = function (m, div) {
 
     function hideDiv() {
       // fadeout div so that it can't be seen when the window is resized
@@ -111,23 +131,21 @@ var Modal = (function (document, window) {
 
   };
 
-  var close = function(event) {
-    // event.preventDefault();
-    // event.stopImmediatePropagation();
+  close = function (event) {
+    var target, div, i;
+    
+    target = event.target;
+    div = document.getElementById('modal__temp');
 
-    var target = event.target;
-    var div = document.getElementById('modal__temp');
-    var i;
-    console.log(target);
     function removeDiv() {
-      setTimeout(function() {
-        window.requestAnimationFrame(function() {
+      setTimeout(function () {
+        window.requestAnimationFrame(function () {
           div.remove();
         });
       }, contentDelay - 50);
     }
 
-    if (isOpen && target.classList.contains('modal__bg') || target.classList.contains('modal__close')) {
+    if ((isOpen && target.classList.contains('modal__bg')) || target.classList.contains('modal__close')) {
       event.preventDefault();
       event.stopImmediatePropagation();
       // make the hidden div visible again and remove the transforms so it scales back to its original size
@@ -153,12 +171,10 @@ var Modal = (function (document, window) {
 
       isOpen = false;
 
-    } else {
-
     }
   };
 
-  var bindActions = function() {
+  bindActions = function () {
     var i;
     /* bind triggers */
     for (i = 0; i < trigger.length; i++) {
@@ -177,7 +193,7 @@ var Modal = (function (document, window) {
 
   };
 
-  var init = function() {
+  init = function () {
     bindActions();
   };
 
@@ -185,6 +201,6 @@ var Modal = (function (document, window) {
     init: init
   };
 
-})(document, window);
+}(document, window));
 
 Modal.init();
