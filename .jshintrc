@@ -14,8 +14,8 @@
   "undef": true,
   "unused": true,
   "strict": true,
-  "globals": [
-    "window",
-    "document"
-  ]
+  "globals": {
+    "window": false,
+    "document": false
+  }
 }
