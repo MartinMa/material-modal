@@ -7,7 +7,6 @@ var Modal = (function (document, window) {
     modalsbg,
     content,
     closers,
-    w,
     isOpen,
     contentDelay,
     getId,
@@ -29,7 +28,6 @@ var Modal = (function (document, window) {
   modalsbg = methods.qsa('.modal__bg');
   content = methods.qsa('.modal__content');
   closers = methods.qsa('.modal__close');
-  w = window;
   isOpen = false;
   contentDelay = 400;
 
@@ -60,13 +58,12 @@ var Modal = (function (document, window) {
   };
 
   moveTrig = function (trig, modal, div) {
-    var trigProps, m, mProps, transX, transY, scaleX, scaleY, xc, yc;
+    var trigProps, mProps, transX, transY, scaleX, scaleY, xc, yc;
     
     trigProps = trig.getBoundingClientRect();
-    m = modal;
-    mProps = m.querySelector('.modal__content').getBoundingClientRect();
-    xc = w.innerWidth / 2;
-    yc = w.innerHeight / 2;
+    mProps = modal.querySelector('.modal__content').getBoundingClientRect();
+    xc = window.innerWidth / 2;
+    yc = window.innerHeight / 2;
 
     // this class increases z-index value so the button goes overtop the other buttons
     trig.classList.add('modal__trigger--active');
@@ -84,7 +81,7 @@ var Modal = (function (document, window) {
     transY = Math.round(yc - trigProps.top - trigProps.height / 2);
 
     // if the modal is aligned to the top then move the button to the center-y of the modal instead of the window
-    if (m.classList.contains('modal--align-top')) {
+    if (modal.classList.contains('modal--align-top')) {
       transY = Math.round(mProps.height / 2 + mProps.top - trigProps.top - trigProps.height / 2);
     }
 
@@ -101,14 +98,12 @@ var Modal = (function (document, window) {
 
     window.setTimeout(function () {
       window.requestAnimationFrame(function () {
-        open(m, div);
+        open(modal, div);
       });
     }, contentDelay);
-
   };
 
   open = function (m, div) {
-
     function hideDiv() {
       // fadeout div so that it can't be seen when the window is resized
       div.style.opacity = '0';
@@ -127,8 +122,6 @@ var Modal = (function (document, window) {
 
       isOpen = true;
     }
-
-
   };
 
   close = function (event) {
@@ -176,6 +169,7 @@ var Modal = (function (document, window) {
 
   bindActions = function () {
     var i;
+
     /* bind triggers */
     for (i = 0; i < trigger.length; i++) {
       trigger[i].addEventListener('click', getId, false);
