@@ -2,7 +2,7 @@ var Modal = (function (document, window) {
   'use strict';
 
   var methods,
-    trigger,
+    triggers,
     modals,
     modalsbg,
     content,
@@ -23,7 +23,7 @@ var Modal = (function (document, window) {
     }
   };
 
-  trigger = methods.qsa('.modal__trigger');
+  triggers = methods.qsa('.modal__trigger');
   modals = methods.qsa('.modal');
   modalsbg = methods.qsa('.modal__bg');
   content = methods.qsa('.modal__content');
@@ -32,14 +32,15 @@ var Modal = (function (document, window) {
   contentDelay = 400;
 
   getId = function (event) {
-    var self, modalId, len, modalIdTrimmed, modal;
+    var self, modalId, modal;
     
     event.preventDefault();
     self = this;
     modalId = self.dataset.modal;
-    len = modalId.length;
-    modalIdTrimmed = modalId.substring(1, len);
-    modal = document.getElementById(modalIdTrimmed);
+    
+    // Remove # symbol at the beginning
+    modalId = modalId.substring(1, modalId.length);
+    modal = document.getElementById(modalId);
     makeDiv(self, modal);
   };
 
@@ -144,10 +145,10 @@ var Modal = (function (document, window) {
       div.removeAttribute('style');
 
       /* Remove active classes from triggers */
-      for (i = 0; i < trigger.length; i++) {
-        trigger[i].style.transform = 'none';
-        trigger[i].style.webkitTransform = 'none';
-        trigger[i].classList.remove('modal__trigger--active');
+      for (i = 0; i < triggers.length; i++) {
+        triggers[i].style.transform = 'none';
+        triggers[i].style.webkitTransform = 'none';
+        triggers[i].classList.remove('modal__trigger--active');
       }
 
       /* Remove active classes from modals */
@@ -167,8 +168,8 @@ var Modal = (function (document, window) {
     var i;
 
     /* bind triggers */
-    for (i = 0; i < trigger.length; i++) {
-      trigger[i].addEventListener('click', getId, false);
+    for (i = 0; i < triggers.length; i++) {
+      triggers[i].addEventListener('click', getId, false);
     }
 
     /* bind modals */
