@@ -75,7 +75,6 @@ var Modal = (function (document, window) {
     scaleX = scaleX.toFixed(3); // round to 3 decimal places
     scaleY = scaleY.toFixed(3);
 
-
     // these values are used to move the button to the center of the window
     transX = Math.round(xc - trigProps.left - trigProps.width / 2);
     transY = Math.round(yc - trigProps.top - trigProps.height / 2);
@@ -85,7 +84,6 @@ var Modal = (function (document, window) {
       transY = Math.round(mProps.height / 2 + mProps.top - trigProps.top - trigProps.height / 2);
     }
 
-
     // translate button to center of screen
     trig.style.transform = 'translate(' + transX + 'px, ' + transY + 'px)';
     trig.style.webkitTransform = 'translate(' + transX + 'px, ' + transY + 'px)';
@@ -94,7 +92,6 @@ var Modal = (function (document, window) {
     div.style.backgroundColor = '#fff'; // transitions background color
     div.style.transform = 'scale(' + scaleX + ',' + scaleY + ')';
     div.style.webkitTransform = 'scale(' + scaleX + ',' + scaleY + ')';
-
 
     window.setTimeout(function () {
       window.requestAnimationFrame(function () {
@@ -163,7 +160,6 @@ var Modal = (function (document, window) {
       div.addEventListener('transitionend', removeDiv, false);
 
       isOpen = false;
-
     }
   };
 
@@ -184,7 +180,6 @@ var Modal = (function (document, window) {
     for (i = 0; i < modalsbg.length; i++) {
       modalsbg[i].addEventListener('click', close, false);
     }
-
   };
 
   init = function () {
