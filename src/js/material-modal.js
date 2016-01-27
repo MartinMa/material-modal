@@ -4,47 +4,59 @@ var Modal = (function (document, window) {
   var methods,
     triggers,
     modals,
-    modalsbg,
+    modalBackdrops,
     content,
     closers,
     isOpen,
     contentDelay,
-    getId,
-    makeDiv,
-    moveTrig,
+    getTargetModal,
+    getHelperDiv,
+    animateTrigger,
     open,
     close,
     bindActions,
-    init;
+    init,
+    open2;
   
   methods = {
+    // Shorthand method for convenience.
     qsa: function (el) {
       return document.querySelectorAll(el);
     }
   };
 
-  triggers = methods.qsa('.modal__trigger');
-  modals = methods.qsa('.modal');
-  modalsbg = methods.qsa('.modal__bg');
-  content = methods.qsa('.modal__content');
-  closers = methods.qsa('.modal__close');
   isOpen = false;
-  contentDelay = 400;
+  contentDelay = 4000;
 
-  getId = function (event) {
-    var self, modalId, modal;
+  open2 = function (event) {
+    var triggerButton, modal, helperDiv;
     
     event.preventDefault();
-    self = this;
-    modalId = self.dataset.modal;
+    
+    triggerButton = this;
+    
+    // Determine target modal.
+    modal = getTargetModal(triggerButton);
+    
+    // Retrieve helper div for animation.
+    // The helper div has the same dimensions as the trigger button.
+    helperDiv = getHelperDiv(triggerButton);
+    
+    // Animate the helper div to the position and size of the modal.
+    animateTrigger(triggerButton, modal, helperDiv);
+  };
+
+  getTargetModal = function (triggerButton) {
+    var modalId;
+    
+    modalId = triggerButton.dataset.modal;
     
     // Remove # symbol at the beginning
     modalId = modalId.substring(1, modalId.length);
-    modal = document.getElementById(modalId);
-    makeDiv(self, modal);
+    return document.getElementById(modalId);
   };
 
-  makeDiv = function (self, modal) {
+  getHelperDiv = function (triggerButton) {
     var tempdiv, div;
 
     tempdiv = document.getElementById('modal__temp');
@@ -52,68 +64,76 @@ var Modal = (function (document, window) {
     if (tempdiv === null) {
       div = document.createElement('div');
       div.id = 'modal__temp';
-      self.appendChild(div);
-      div.style.backgroundColor = window.getComputedStyle(self).backgroundColor;
-      moveTrig(self, modal, div);
+      triggerButton.appendChild(div);
+      div.style.backgroundColor = window.getComputedStyle(triggerButton).backgroundColor;
+      return div;
     }
   };
 
-  moveTrig = function (trig, modal, div) {
-    var trigProps, mProps, transX, transY, scaleX, scaleY, xc, yc;
+  animateTrigger = function (triggerButton, modal, helperDiv) {
+    var triggerProperties, modalProperties, translateX, translateY, scaleX, scaleY;
     
-    trigProps = trig.getBoundingClientRect();
-    mProps = modal.querySelector('.modal__content').getBoundingClientRect();
-    xc = window.innerWidth / 2;
-    yc = window.innerHeight / 2;
+    triggerProperties = triggerButton.getBoundingClientRect();
+    modalProperties = modal.querySelector('.modal__content').getBoundingClientRect();
 
-    // this class increases z-index value so the button goes overtop the other buttons
-    trig.classList.add('modal__trigger--active');
+    // This class increases the z-index value, so the button goes overtop the other buttons.
+    triggerButton.classList.add('modal__trigger--active');
 
-    // these values are used for scale the temporary div to the same size as the modal
-    scaleX = mProps.width / trigProps.width;
-    scaleY = mProps.height / trigProps.height;
+    // These values are used to scale the helper div to the same size as the modal.
+    scaleX = modalProperties.width / triggerProperties.width;
+    scaleY = modalProperties.height / triggerProperties.height;
 
-    scaleX = scaleX.toFixed(3); // round to 3 decimal places
+    // Round to 3 decimal places.
+    scaleX = scaleX.toFixed(3);
     scaleY = scaleY.toFixed(3);
 
-    // these values are used to move the button to the center of the window
-    transX = Math.round(xc - trigProps.left - trigProps.width / 2);
-    transY = Math.round(yc - trigProps.top - trigProps.height / 2);
+    // These values are used to move the button to the center of the window.
+    translateX = Math.round((window.innerWidth / 2) -
+                            triggerProperties.left -
+                            (triggerProperties.width / 2));
+    translateY = Math.round((window.innerHeight / 2) -
+                            triggerProperties.top -
+                            (triggerProperties.height / 2));
 
-    // if the modal is aligned to the top then move the button to the center-y of the modal instead of the window
+    // If the modal is aligned to the top, then move the button to the center-y of the modal instead
+    // of the window.
     if (modal.classList.contains('modal--align-top')) {
-      transY = Math.round(mProps.height / 2 + mProps.top - trigProps.top - trigProps.height / 2);
+      translateY = Math.round(modalProperties.top +
+                              (modalProperties.height / 2) -
+                              triggerProperties.top -
+                              (triggerProperties.height / 2));
     }
 
-    // translate button to center of screen
-    trig.style.transform = 'translate(' + transX + 'px, ' + transY + 'px)';
-    trig.style.webkitTransform = 'translate(' + transX + 'px, ' + transY + 'px)';
+    // Translate the button to the center where the modal is about to appear (transition).
+    triggerButton.style.transform = 'translate(' + translateX + 'px, ' + translateY + 'px)';
+    triggerButton.style.webkitTransform = 'translate(' + translateX + 'px, ' + translateY + 'px)';
 
-    // expand temporary div to the same size as the modal
-    div.style.backgroundColor = '#fff'; // transitions background color
-    div.style.transform = 'scale(' + scaleX + ',' + scaleY + ')';
-    div.style.webkitTransform = 'scale(' + scaleX + ',' + scaleY + ')';
+    // Expand the helper div to the same size as the modal (transition).
+    // Destination properties: background-color and transform.
+    helperDiv.style.backgroundColor = '#fff';
+    helperDiv.style.transform = 'scale(' + scaleX + ', ' + scaleY + ')';
+    helperDiv.style.webkitTransform = 'scale(' + scaleX + ', ' + scaleY + ')';
 
     window.setTimeout(function () {
       window.requestAnimationFrame(function () {
-        open(modal, div);
+        open(modal, helperDiv);
       });
     }, contentDelay);
   };
 
-  open = function (m, div) {
+  open = function (modal, helperDiv) {
     function hideDiv() {
       // fadeout div so that it can't be seen when the window is resized
-      div.style.opacity = '0';
+      helperDiv.style.opacity = '0';
       content.removeEventListener('transitionend', hideDiv, false);
     }
 
     if (!isOpen) {
       // select the content inside the modal
-      var content = m.querySelector('.modal__content');
-      // reveal the modal
-      m.classList.add('modal--active');
-      // reveal the modal content
+      var content = modal.querySelector('.modal__content');
+      // Reveal the modal (includes backdrop).
+      modal.classList.add('modal--active');
+      // Reveal the modal content (actual modal window).
       content.classList.add('modal__content--active');
 
       content.addEventListener('transitionend', hideDiv, false);
@@ -123,42 +143,43 @@ var Modal = (function (document, window) {
   };
 
   close = function (event) {
-    var target, div, i;
+    var target, helperDiv, i;
     
     target = event.target;
-    div = document.getElementById('modal__temp');
+    helperDiv = document.getElementById('modal__temp');
 
-    function removeDiv() {
+    function removeHelperDiv() {
       setTimeout(function () {
         window.requestAnimationFrame(function () {
-          div.remove();
+          helperDiv.remove();
         });
       }, contentDelay - 50);
     }
 
-    if ((isOpen && target.classList.contains('modal__bg')) || target.classList.contains('modal__close')) {
+    if ((isOpen && target.classList.contains('modal__backdrop')) ||
+        target.classList.contains('modal__close')) {
       event.preventDefault();
       event.stopImmediatePropagation();
-      // make the hidden div visible again and remove the transforms so it scales back to its original size
-      div.style.opacity = '1';
-      // div.style.backgroundColor = window.getComputedStyle(self).backgroundColor;
-      div.removeAttribute('style');
+      
+      // Make the helper div visible again and remove the transforms so it scales back to its
+      // original size.
+      // When the helper div finished transforming back, remove it from the DOM.
+      helperDiv.addEventListener('transitionend', removeHelperDiv, false);
+      helperDiv.style.opacity = '1';
+      helperDiv.removeAttribute('style');
 
-      /* Remove active classes from triggers */
+      // Remove active classes from triggers.
       for (i = 0; i < triggers.length; i++) {
         triggers[i].style.transform = 'none';
         triggers[i].style.webkitTransform = 'none';
         triggers[i].classList.remove('modal__trigger--active');
       }
 
-      /* Remove active classes from modals */
+      // Remove active classes from modals.
       for (i = 0; i < modals.length; i++) {
         modals[i].classList.remove('modal--active');
         content[i].classList.remove('modal__content--active');
       }
-
-      // when the temporary div is opacity:1 again, we want to remove it from the dom
-      div.addEventListener('transitionend', removeDiv, false);
 
       isOpen = false;
     }
@@ -167,19 +188,26 @@ var Modal = (function (document, window) {
   bindActions = function () {
     var i;
 
-    /* bind triggers */
+    // Initialize arrays.
+    triggers = methods.qsa('.modal__trigger');
+    modals = methods.qsa('.modal');
+    modalBackdrops = methods.qsa('.modal__backdrop');
+    content = methods.qsa('.modal__content');
+    closers = methods.qsa('.modal__close');
+    
+    // Auto-bind triggers.
     for (i = 0; i < triggers.length; i++) {
-      triggers[i].addEventListener('click', getId, false);
+      triggers[i].addEventListener('click', open2, false);
     }
 
-    /* bind modals */
+    // Auto-bind modal close buttons.
     for (i = 0; i < closers.length; i++) {
       closers[i].addEventListener('click', close, false);
     }
 
-    /* bind modal__bgs */
-    for (i = 0; i < modalsbg.length; i++) {
-      modalsbg[i].addEventListener('click', close, false);
+    // Auto-bind modal backgrounds.
+    for (i = 0; i < modalBackdrops.length; i++) {
+      modalBackdrops[i].addEventListener('click', close, false);
     }
   };
 
