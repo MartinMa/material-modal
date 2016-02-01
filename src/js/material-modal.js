@@ -12,11 +12,11 @@ var Modal = (function (document, window) {
     getTargetModal,
     getHelperDiv,
     animateTrigger,
-    open,
+    fadeIn,
     close,
     bindActions,
     init,
-    open2;
+    open;
   
   methods = {
     // Shorthand method for convenience.
@@ -28,7 +28,7 @@ var Modal = (function (document, window) {
   isOpen = false;
   contentDelay = 4000;
 
-  open2 = function (event) {
+  open = function (event) {
     var triggerButton, modal, helperDiv;
     
     event.preventDefault();
@@ -114,15 +114,13 @@ var Modal = (function (document, window) {
     helperDiv.style.transform = 'scale(' + scaleX + ', ' + scaleY + ')';
     helperDiv.style.webkitTransform = 'scale(' + scaleX + ', ' + scaleY + ')';
 
-    window.setTimeout(function () {
-      window.requestAnimationFrame(function () {
-        open(modal, helperDiv);
-      });
-    }, contentDelay);
+    // Fade in modal with a css defined delay of 0.4s.
+    fadeIn(modal, helperDiv);
   };
 
-  open = function (modal, helperDiv) {
+  fadeIn = function (modal, helperDiv) {
     function hideDiv() {
+      console.log('hideDiv');
       // fadeout div so that it can't be seen when the window is resized
       helperDiv.style.opacity = '0';
       content.removeEventListener('transitionend', hideDiv, false);
@@ -149,6 +147,7 @@ var Modal = (function (document, window) {
     helperDiv = document.getElementById('modal__temp');
 
     function removeHelperDiv() {
+      console.log('removeHelperDiv');
       setTimeout(function () {
         window.requestAnimationFrame(function () {
           helperDiv.remove();
@@ -197,7 +196,7 @@ var Modal = (function (document, window) {
     
     // Auto-bind triggers.
     for (i = 0; i < triggers.length; i++) {
-      triggers[i].addEventListener('click', open2, false);
+      triggers[i].addEventListener('click', open, false);
     }
 
     // Auto-bind modal close buttons.
