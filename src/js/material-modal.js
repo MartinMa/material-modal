@@ -26,7 +26,6 @@ var Modal = (function (document, window) {
   };
 
   isOpen = false;
-  contentDelay = 4000;
 
   open = function (event) {
     var triggerButton, modal, helperDiv;
@@ -120,7 +119,6 @@ var Modal = (function (document, window) {
 
   fadeIn = function (modal, helperDiv) {
     function hideDiv() {
-      console.log('hideDiv');
       // fadeout div so that it can't be seen when the window is resized
       helperDiv.style.opacity = '0';
       content.removeEventListener('transitionend', hideDiv, false);
@@ -146,13 +144,12 @@ var Modal = (function (document, window) {
     target = event.target;
     helperDiv = document.getElementById('modal__temp');
 
-    function removeHelperDiv() {
-      console.log('removeHelperDiv');
-      setTimeout(function () {
-        window.requestAnimationFrame(function () {
-          helperDiv.remove();
-        });
-      }, contentDelay - 50);
+    function removeHelperDiv(event) {
+      if(event.target === helperDiv &&
+         event.propertyName === 'transform') {
+        // The event listener is removed, too.
+        helperDiv.remove();
+      }
     }
 
     if ((isOpen && target.classList.contains('modal__backdrop')) ||
